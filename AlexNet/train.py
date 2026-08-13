@@ -12,6 +12,7 @@ import seaborn as sns
 class Trainer:
     def __init__(self, config):
         self.config = config
+        self.patience = 0
         self.device = torch.device(
             "cuda"
             if config.device == "cuda" and torch.cuda.is_available()
@@ -35,6 +36,7 @@ class Trainer:
             self.best_metric = float("inf")
 
     def train(self, model, dataset):
+
         model = model.to(self.device)
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.AdamW(
@@ -49,6 +51,9 @@ class Trainer:
             )
 
         for epoch in range(start_epoch, self.config.epochs):
+
+            if self.patience == self.config.patience_count:
+                continue
 
             print(f"\nEpoch [{epoch+1}/{self.config.epochs}]")
 
@@ -106,6 +111,7 @@ class Trainer:
                 )
 
                 if improved:
+                    self.patience = 0
                     self.best_metric = metric
 
                     self._save_checkpoint(
@@ -120,6 +126,12 @@ class Trainer:
                             "best_val_accuracy": val_acc,
                             "best_val_loss" : val_loss
                         })
+                elif self.config.early_stoping:
+                    self.patience += 1
+                    if self.patience == self.config.patience_count:
+                        print(f"Early stoping trigered at epoch {epoch} due to no improvement")
+                        break
+                    
 
         _ = self._load_checkpoint(model, optimizer, best = True)
 

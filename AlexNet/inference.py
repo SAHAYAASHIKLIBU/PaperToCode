@@ -23,7 +23,7 @@ class classify:
                                  std=(0.2470, 0.2435, 0.2616))])
         self.resize = Resize((self.config.img_size, self.config.img_size))
 
-    def predict(self, idToClass: dict, images: list | str | None = None, file_name: str = "sample.png"):
+    def predict(self, idToClass: dict, images: list | str | None = None):
         if images == None:
             images = self.pic_images_from_testset()
             images = glob.glob(self.config.dataset_images_path + "/*.jpg")
@@ -37,14 +37,14 @@ class classify:
                     plots[i].set_title(f"Class : {idToClass[out]}")
                     plots[i].axis("off")
                 plt.tight_layout()
-                plt.savefig(file_name)
+                plt.savefig(self.config.plot_file_name)
                 plt.close()
         elif isinstance(images, str):
             out = self._predict(images)
             plt.imshow(Image.open(images).convert("RGB"))
             plt.axis("off")
             plt.title(f"Class : {idToClass[out]}")
-            plt.savefig(file_name)
+            plt.savefig(self.config.plot_file_name)
         else:
             print("Currently not supported")
 
@@ -55,7 +55,7 @@ class classify:
         out = self.model(img).argmax()
         return int(out)
 
-    def pic_images_from_testset(self, loader = loader, count = 10, clear = False):
+    def pic_images_from_testset(self, loader, count = 10, clear = False):
         if clear and os.path.isdir(self.config.dataset_images_path):
             shutil.rmtree(self.config.dataset_images_path)
         test_set = loader.test_infer

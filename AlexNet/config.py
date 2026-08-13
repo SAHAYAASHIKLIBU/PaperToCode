@@ -17,6 +17,9 @@ class TrainConfig:
     save_best_model: bool = True
     save_last_model: bool = True
 
+    early_stoping: bool = True
+    patience_count: int = 5
+
     # Monitor metric for best model
     monitor: Literal["val_loss", "val_acc"] = "val_acc"
 
@@ -57,7 +60,7 @@ class InferenceConfig:
     load_from_checkpoint: bool = True
     checkpoint_path: str = "./checkpoints/best.pt"
     dataset_images_path: str = "./images"
-    plot_file_name: str = "sample.png"
+    plot_file_name: str = "./plots/sample.png"
     
     
 
