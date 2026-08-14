@@ -8,22 +8,22 @@ from torchvision import datasets
 import random
 import glob
 import os
-
 import wandb
 
 
 
-class classify:
-    def __init__(self, model, config):
+class Classify:
+    def __init__(self, model, config, loader):
         self.model = model
         self.config = config
+        self.loader = loader
         self.transforms = Compose([ToTensor(),
                             Resize((self.config.img_size, self.config.img_size)),
                             Normalize(mean=(0.4914, 0.4822, 0.4465),\
                                  std=(0.2470, 0.2435, 0.2616))])
         self.resize = Resize((self.config.img_size, self.config.img_size))
 
-    def predict(self, idToClass: dict, images: list | str | None = None):
+    def predict(self, images: list | str | None = None):
         if images == None:
             images = self.pic_images_from_testset()
             images = glob.glob(self.config.dataset_images_path + "/*.jpg")
@@ -34,7 +34,7 @@ class classify:
                 for i in range(len(images)):
                     out = self._predict(images[i])
                     plots[i].imshow(Image.open(images[i]).convert("RGB"))
-                    plots[i].set_title(f"Class : {idToClass[out]}")
+                    plots[i].set_title(f"Class : {self.loader.idToclasses[out]}")
                     plots[i].axis("off")
                 plt.tight_layout()
                 plt.savefig(self.config.plot_file_name)
@@ -43,7 +43,7 @@ class classify:
             out = self._predict(images)
             plt.imshow(Image.open(images).convert("RGB"))
             plt.axis("off")
-            plt.title(f"Class : {idToClass[out]}")
+            plt.title(f"Class : {self.loader.idToclasses[out]}")
             plt.savefig(self.config.plot_file_name)
         else:
             print("Currently not supported")
@@ -55,10 +55,10 @@ class classify:
         out = self.model(img).argmax()
         return int(out)
 
-    def pic_images_from_testset(self, loader, count = 10, clear = False):
+    def pic_images_from_testset(self, count = 10, clear = False):
         if clear and os.path.isdir(self.config.dataset_images_path):
             shutil.rmtree(self.config.dataset_images_path)
-        test_set = loader.test_infer
+        test_set = self.loader.test_infer
         os.makedirs(self.config.dataset_images_path, exist_ok = True)
         total = len(test_set)
         for i in range(count):
