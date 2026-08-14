@@ -50,10 +50,13 @@ class Classify:
 
     
     def _predict(self, img):
-        img = Image.open(img).convert("RGB")
-        img = self.transforms(img).unsqueeze(0)
-        out = self.model(img).argmax()
-        return int(out)
+        with torch.no_grad():
+            img = Image.open(img).convert("RGB")
+            img = self.transforms(img).unsqueeze(0)
+            device = next(self.model.parameters()).device
+            img = img.to(device)
+            out = self.model(img).argmax()
+            return int(out)
 
     def pic_images_from_testset(self, count = 10, clear = False):
         if clear and os.path.isdir(self.config.dataset_images_path):

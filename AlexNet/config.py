@@ -6,7 +6,7 @@ from typing import Literal
 @dataclass
 class TrainConfig:
     # Training
-    epochs: int = 100
+    epochs: int = 1
     lr: float = 1e-3
     device: Literal["cuda", "cpu"] = "cuda"
 
@@ -28,7 +28,7 @@ class TrainConfig:
     plot_path: str = "./plots"
 
     # WandB
-    wandb_monitor: bool = True
+    wandb_monitor: bool = False
     project_name: str = "AlexNet"
     run_name: str = "alextnet-cifar-10"
 
@@ -42,7 +42,7 @@ class TrainConfig:
 class DatasetConfig:
     # Dataset
     img_size: int = 224
-    batch_size: int = 64
+    batch_size: int = 16
 
     # DataLoader
     train_shuffle: bool = True
