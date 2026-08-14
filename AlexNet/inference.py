@@ -2,13 +2,13 @@ from ntpath import isfile
 from PIL import Image
 import matplotlib.pyplot as plt
 import shutil
-from torchvision.transforms import Compose, Normalize, Resize, ToTensor, ToPILImage
+from torchvision.transforms import Compose, Normalize, Resize, ToTensor
 import numpy as np
 from torchvision import datasets
 import random
 import glob
 import os
-import wandb
+import torch
 
 
 
@@ -22,6 +22,7 @@ class Classify:
                             Normalize(mean=(0.4914, 0.4822, 0.4465),\
                                  std=(0.2470, 0.2435, 0.2616))])
         self.resize = Resize((self.config.img_size, self.config.img_size))
+
 
     def predict(self, images: list | str | None = None):
         if images == None:
