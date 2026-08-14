@@ -80,7 +80,8 @@ class Trainer:
                         "train/loss" : train_loss,
                         "train/accuracy" : train_acc,
                         "test/loss" : val_loss,
-                        "test/accuracy": val_acc})
+                        "test/accuracy": val_acc,
+                        "early_stoping_counter": self.patience})
             print(
                 f"Train Loss: {train_loss:.4f} | "
                 f"Train Acc: {train_acc:.2f}% | "
@@ -129,6 +130,8 @@ class Trainer:
                 elif self.config.early_stoping:
                     self.patience += 1
                     if self.patience == self.config.patience_count:
+                        wandb.run.summary["early_stopping"] = True
+                        wandb.run.summary["early_stopping_epoch"] = epoch
                         print(f"Early stoping trigered at epoch {epoch} due to no improvement")
                         break
                     
@@ -395,6 +398,7 @@ class Trainer:
     
     def _save_csv(self):
         df = pd.DataFrame([self.history])
+        os.makedirs(self.config.csv_path, exist_ok = True)
         df.to_csv(self.config.csv_path)
         if self.config.wandb_monitor:
             csv_artifact = wandb.Artifact("Csv_log", type = "dataset", description = "log csv file")
