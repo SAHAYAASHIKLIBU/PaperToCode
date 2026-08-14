@@ -12,7 +12,7 @@ train_config = TrainConfig()
 inference_config = InferenceConfig()
 data = Dataset(data_config)
 model = AlexNet()
-train = Trainer(TrainConfig)
+train = Trainer(train_config)
 train.train(model, data)
 
 state_dict = torch.load(os.path.join(train_config.checkpoint_path, "best.pt"))
